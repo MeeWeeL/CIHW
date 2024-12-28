@@ -3,10 +3,10 @@ name: CI/CD Pipeline  # Имя
 on:
   push:
     branches:
-      - main  # Запускаем при каждом пуше в основную ветку
+      - master  # Запускаем при каждом пуше в основную ветку
   pull_request:
     branches:
-      - main  # Запускаем при создании pull request в основную ветку
+      - master  # Запускаем при создании pull request в основную ветку
 
 jobs:
   build:  # Определяем job для сборки проекта

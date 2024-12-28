@@ -1,0 +1,56 @@
+name: CI/CD Pipeline  # Имя
+
+on:
+  push:
+    branches:
+      - main  # Запускаем при каждом пуше в основную ветку
+  pull_request:
+    branches:
+      - main  # Запускаем при создании pull request в основную ветку
+
+jobs:
+  build:  # Определяем job для сборки проекта
+    runs-on: ${{ matrix.os }}  # Указываем, на каких операционных системах будет выполняться job
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]  # Разные ОС
+
+    steps:  # Определяем шаги внутри job
+      - name: Checkout code
+        uses: actions/checkout@v2  # Используем действие для клонирования кода
+
+      - name: Set up JDK  # Шаг для установки Java Development Kit
+        uses: actions/setup-java@v2  # Используем действие для настройки Java
+        with:
+          java-version: '18'  # Указываем версию JDK, необходимую для проекта
+
+      - name: Install dependencies  # Шаг для установки зависимостей проекта
+        run: ./gradlew dependencies  # Запускаем команду Gradle для установки зависимостей
+
+      - name: Build with Gradle  # Шаг для сборки проекта
+        run: ./gradlew build  # Запускаем команду Gradle для сборки приложения
+
+      - name: Run tests  # Шаг для запуска юнит-тестов
+        run: ./gradlew test  # Запускаем команду Gradle для выполнения тестов
+
+  deploy:  # Определяем job для деплоя приложения
+    runs-on: ubuntu-latest  # Указываем, что деплой будет выполняться на Ubuntu
+    needs: build  # Указываем, что этот job зависит от успешного завершения job build
+    if: success()  # Деплой выполняется только если предыдущие шаги завершились успешно
+
+    steps:  # Определяем шаги внутри job
+      - name: Checkout code  # Шаг для клонирования репозитория
+        uses: actions/checkout@v2  # Используем действие для клонирования кода
+
+      - name: Deploy to Railway  # Шаг для развертывания приложения на Railway
+        env:
+          RAILWAY_API_KEY: ${{ secrets.RAILWAY_API_KEY }}  # Получаем API-ключ Railway из секретов репозитория
+          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}  # Получаем ID проекта Railway из секретов
+        run: |
+          # Отправляем запрос на деплой на Railway
+          curl -X POST "https://api.railway.app/v2/projects/${RAILWAY_PROJECT_ID}/deploy" \
+          -H "Authorization: Bearer ${RAILWAY_API_KEY}" \
+          -H "Content-Type: application/json" \
+          -d '{
+            "branch": "main"  # Указываем ветку, которую хотим развернуть
+          }'

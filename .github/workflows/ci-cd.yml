@@ -22,7 +22,8 @@ jobs:
       - name: Set up JDK  # Шаг для установки Java Development Kit
         uses: actions/setup-java@v2  # Используем действие для настройки Java
         with:
-          java-version: '18'  # Указываем версию JDK, необходимую для проекта
+          java-version: '18' # Указываем версию JDK, необходимую для проекта
+          distribution: 'temurin' # Указываем версию дистрибутива
 
       - name: Install dependencies  # Шаг для установки зависимостей проекта
         run: ./gradlew dependencies  # Запускаем команду Gradle для установки зависимостей

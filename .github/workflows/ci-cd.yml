@@ -23,7 +23,7 @@ jobs:
         uses: actions/setup-java@v2  # Используем действие для настройки Java
         with:
           java-version: '11' # Указываем версию JDK, необходимую для проекта
-          distribution: 'AdoptOpenJDK-11' # Указываем версию дистрибутива
+          distribution: 'temurin' # Указываем версию дистрибутива
 
       - name: Install dependencies  # Шаг для установки зависимостей проекта
         run: ./gradlew dependencies  # Запускаем команду Gradle для установки зависимостей
